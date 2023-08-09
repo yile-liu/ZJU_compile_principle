@@ -1,0 +1,238 @@
+char ch[105][700];
+char ct[700];
+int id[105];
+int score[105];
+int pre[105][7][7];
+int grade[105];
+int pre_cnt[105];
+int pre_set_cnt[105][7];
+int ind[105];
+int cnt;
+int enf;
+
+    cnt = 0;
+    enf = 1;
+    while(1) {
+        scan(ct);
+        int l;
+        l = 0;
+        while(ct[l] != 0) {
+            ch[cnt][l] = ct[l];
+            ct[l] = 0;
+            l = l + 1;
+        };
+        if(l == 0) {
+            break;
+        };
+        ch[cnt][l] = '#';
+        cnt = cnt + 1;
+    };
+    int i;
+    i = 0;
+    while(i < cnt) {
+        int j;
+        j = 0;
+        int len;
+        len = 0;
+        while(ch[i][len] != '#') { len = len + 1; };
+        j = 0;
+        if(ch[i][0] == 120) {
+            enf = 0;
+            print("GPA: 0.0");
+            println;
+            print("Hours Attempted: 0");
+            println;
+            print("Hours Completed: 0");
+            println;
+            print("Credits Remaining: 3");
+            println;
+            println;
+            print("Possible Courses to Take Next");
+            println;
+        };
+        if(enf == 0) {
+            break;
+        };
+        if(len == 0) {
+            break;
+        };
+        int num;
+        num = 0;
+        while(j < len) {
+            if(ch[i][j] == '|') {
+                j = j + 1;
+                id[i] = num;
+                num = 0;
+                break;
+            };
+            if(ch[i][j] == 'c') {
+                j = j + 1;
+                continue;
+            };
+            num = (num * 10) + (ch[i][j] - '0');
+            j = j + 1;
+        };
+        while(j < len) {
+            if(ch[i][j] == '|') {
+                j = j + 1;
+                score[i] = num;
+                num = 0;
+                break;
+            };
+            num = (num * 10) + (ch[i][j] - '0');
+            j = j + 1;
+        };
+        pre_cnt[i] = 0;
+        int set_cnt;
+        set_cnt = 0;
+        int f;
+        f = 0;
+        int pref;
+        pref = 0;
+        while(j < len) {
+            if(ch[i][j] == '|') {
+                if(f != 0) {
+                    pre[i][pre_cnt[i]][set_cnt] = num;
+                    num = 0;
+                    set_cnt = set_cnt + 1;   
+                };
+                if(pref != 0) {
+                    pre_set_cnt[i][pre_cnt[i]] = set_cnt;
+                    pre_cnt[i] = pre_cnt[i] + 1;
+                    j = j + 1;
+                };
+                if(pref == 0) {
+                    pre_cnt[i] = 0;
+                    j = j + 1;
+                };
+                break;
+            };
+            if(ch[i][j] == 'c') {
+                j = j + 1;
+                f = 1;
+                pref = 1;
+                continue;
+            };
+            if(ch[i][j] == ',') {
+                pre[i][pre_cnt[i]][set_cnt] = num;
+                num = 0;
+                set_cnt = set_cnt + 1;
+                f = 0;
+                j = j + 1;
+                continue;
+            };
+            if(ch[i][j] == ';') {
+                pre[i][pre_cnt[i]][set_cnt] = num;
+                num = 0;
+                f = 0;
+                set_cnt = set_cnt + 1;
+                pre_set_cnt[i][pre_cnt[i]] = set_cnt;
+                pre_cnt[i] = pre_cnt[i] + 1;
+                set_cnt = 0;
+                j = j + 1;
+                continue;
+            };
+            num = (num * 10) + ch[i][j] - '0';
+            j = j + 1;
+        };
+        grade[i] = -1;
+        while(j < len) {
+            grade[i] = 4 - (ch[i][j] - 'A');
+            if(ch[i][j] == 'F') {
+                grade[i] = 0;
+            };
+            j = j + 1;
+            break;
+        };
+        i = i + 1;
+    };
+    if(enf != 0) {
+        int total_sc;
+        int total_gpa;
+        int attempt_sc;
+        int wait_sc;
+        total_sc = 0;
+        total_gpa = 0;
+        attempt_sc = 0;
+        wait_sc = 0;
+        i = 0;
+        while(i <= 100) {
+            ind[i] = -1;
+            i = i + 1;
+        };
+        i = 0;
+        while(i < cnt) {
+            ind[id[i]] = i;
+            if(grade[i] == -1) {
+                wait_sc = wait_sc + score[i];
+            };
+            if(grade[i] == 0) {
+                wait_sc = wait_sc + score[i];
+                attempt_sc = attempt_sc + score[i];
+            };
+            if(grade[i] > 0) {
+                total_sc = total_sc + score[i];
+                attempt_sc = attempt_sc + score[i];
+                total_gpa = total_gpa + (score[i] * grade[i]);
+            };
+            i = i + 1;
+        };
+        float gpa;
+        gpa = total_gpa;
+        if(attempt_sc != 0) {
+            gpa = gpa / attempt_sc;
+        };
+        print("GPA: ");
+        printf(1, gpa);
+        println;
+        print("Hours Attempted: ", attempt_sc);
+        println;
+        print("Hours Completed: ", total_sc);
+        println;
+        print("Credits Remaining: ", wait_sc);
+        println;
+        println;
+        print("Possible Courses to Take Next");
+        println;
+        i = 0;
+        while(i < cnt) {
+            if(grade[i] <= 0) {
+                int j;
+                j = 0;
+                int f;
+                f = 0;
+                if(pre_cnt[i] == 0) {
+                    f = 1;
+                };
+                while(j < pre_cnt[i]) {
+                    int k;
+                    k = 0;
+                    int set_f;
+                    set_f = 1;
+                    while(k < pre_set_cnt[i][j]) {
+                        int p;
+                        p = pre[i][j][k];
+                        p = ind[p];
+                        if(grade[p] <= 0) {
+                            set_f = 0;
+                        };
+                        k = k + 1;
+                    };
+                    if(set_f == 1) {
+                        f = 1;
+                    };
+                    j = j + 1;
+                };
+                if(f == 1) {
+                    print("  c", id[i]);
+                    println;
+                };
+            };
+            i = i + 1;
+        };
+        if(wait_sc == 0) {
+            print("  None - Congratulations!");
+            println;
+        };
+    };
+    end;

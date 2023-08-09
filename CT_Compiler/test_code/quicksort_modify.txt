@@ -1,0 +1,72 @@
+int arr[20000];
+
+int partition(int low, int high)
+{
+    int pivot;
+
+    pivot = arr[high];
+    int i;
+    i = (low - 1);
+
+    int j;
+    j = low;
+    while (j < high)
+    {
+        if (arr[j] < pivot)
+        {
+            i = i + 1;
+            int temp;
+            temp = arr[i];
+            arr[i] = arr[j];
+            arr[j] = temp;
+        };
+        j = j + 1;
+    };
+
+    int temp;
+    temp = arr[i + 1];
+    arr[i + 1] = arr[high];
+    arr[high] = temp;
+
+    return (i + 1);
+};
+
+int quickSort(int low, int high)
+{
+    if (low < high)
+    {
+        int pi;
+        pi = partition(low, high);
+
+        quickSort(low, pi - 1);
+        quickSort(pi + 1, high);
+    };
+
+    return 0;
+};
+
+int n;
+scan(n);
+
+int i;
+i = 0;
+int flag;
+flag = 0;
+while (i < n)
+{
+    scan(arr[i]);
+    i = i + 1;
+};
+
+    quickSort(0, n - 1);
+
+
+i = 0;
+while (i < n)
+{
+    print(arr[i]);
+    println;
+    i = i + 1;
+};
+
+end;
